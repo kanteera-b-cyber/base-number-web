@@ -15,9 +15,11 @@ export default function SignupPage() {
   const router = useRouter();
   const [role, setRole] = useState<UserRole>("student");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isSubmitting) return;
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const email = String(form.get("email") ?? "").trim().toLowerCase();
@@ -38,6 +40,9 @@ export default function SignupPage() {
       return;
     }
 
+    setIsSubmitting(true);
+    setError("");
+
     try {
       await registerUser(name, email, password, role);
       router.push("/");
@@ -45,8 +50,8 @@ export default function SignupPage() {
       const message = registrationError instanceof Error ? registrationError.message : "";
       const normalizedMessage = message.toLowerCase();
 
-      if (normalizedMessage.includes("rate limit") || normalizedMessage.includes("too many")) {
-        setError("ระบบถูกเรียกใช้งานบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่");
+      if (normalizedMessage.includes("rate limit") || normalizedMessage.includes("too many") || normalizedMessage.includes("429")) {
+        setError("สมัครบ่อยเกินไป ระบบ Supabase จำกัดชั่วคราว กรุณารอ 1-2 นาทีแล้วลองใหม่ด้วยอีเมลใหม่");
       } else if (normalizedMessage.includes("already registered") || normalizedMessage.includes("already exists")) {
         setError("อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ");
       } else if (normalizedMessage.includes("invalid email")) {
@@ -54,6 +59,8 @@ export default function SignupPage() {
       } else {
         setError("สมัครสมาชิกไม่สำเร็จ กรุณาตรวจสอบการตั้งค่า Supabase แล้วลองใหม่");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -96,7 +103,7 @@ export default function SignupPage() {
           </fieldset>
 
           {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
-          <button type="submit" className="w-full rounded-xl bg-[#e06f52] px-4 py-3.5 font-bold text-white transition hover:bg-[#c95d43] focus:outline-none focus:ring-4 focus:ring-[#f8c4b6]">สมัครสมาชิกในบทบาท{roleLabels[role]}</button>
+          <button type="submit" disabled={isSubmitting} className="w-full rounded-xl bg-[#e06f52] px-4 py-3.5 font-bold text-white transition hover:bg-[#c95d43] focus:outline-none focus:ring-4 focus:ring-[#f8c4b6] disabled:cursor-not-allowed disabled:opacity-60">{isSubmitting ? "กำลังสมัครสมาชิก..." : `สมัครสมาชิกในบทบาท${roleLabels[role]}`}</button>
         </form>
       </section>
     </main>
