@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { getUsers, roleLabels, saveUser, setSession, UserRole } from "../lib/auth";
+import { registerUser, roleLabels, UserRole } from "../lib/auth";
 import { useRouter } from "next/navigation";
 
 const roleOptions: { role: UserRole; description: string }[] = [
@@ -16,7 +16,7 @@ export default function SignupPage() {
   const [role, setRole] = useState<UserRole>("student");
   const [error, setError] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
@@ -33,15 +33,12 @@ export default function SignupPage() {
       return;
     }
 
-    if (getUsers().some((user) => user.email === email)) {
-      setError("อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ");
-      return;
+    try {
+      await registerUser(name, email, password, role);
+      router.push("/");
+    } catch (registrationError) {
+      setError(registrationError instanceof Error ? registrationError.message : "สมัครสมาชิกไม่สำเร็จ");
     }
-
-    const user = { name, email, password, role };
-    saveUser(user);
-    setSession(user);
-    router.push("/");
   }
 
   return (

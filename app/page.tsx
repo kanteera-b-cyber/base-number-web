@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { clearSession, getClientReady, getServerReady, getServerSession, getSession, roleLabels, subscribeToClientReady, subscribeToSession } from "./lib/auth";
+import { getClientReady, getServerReady, getServerSession, getSession, logout, roleLabels, subscribeToClientReady, subscribeToSession } from "./lib/auth";
 
 const conversionTable = [
   { decimal: 0, binary: "0000", octal: "0", hex: "0" },
@@ -282,8 +282,8 @@ export default function Home() {
 
   if (!isReady || !session) return <main className="min-h-screen bg-[#101a2e]" />;
 
-  function logout() {
-    clearSession();
+  async function handleLogout() {
+    await logout();
     router.replace("/login");
   }
 
@@ -303,7 +303,7 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden text-xs font-semibold text-[#697386] uppercase tracking-wide sm:block">{session.name} · {roleLabels[session.role]}</div>
-          <button type="button" onClick={logout} className="rounded-lg bg-[#101a2e] px-3 py-2 text-xs font-bold text-[#c8f169] hover:bg-[#1d2d49]">ออกจากระบบ</button>
+          <button type="button" onClick={handleLogout} className="rounded-lg bg-[#101a2e] px-3 py-2 text-xs font-bold text-[#c8f169] hover:bg-[#1d2d49]">ออกจากระบบ</button>
         </div>
       </nav>
 

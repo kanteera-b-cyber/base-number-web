@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
-import { clearSession, getClientReady, getServerReady, getServerSession, getSession, roleLabels, subscribeToClientReady, subscribeToSession, UserRole } from "../lib/auth";
+import { getClientReady, getServerReady, getServerSession, getSession, logout, roleLabels, subscribeToClientReady, subscribeToSession, UserRole } from "../lib/auth";
 
 const roleContent: Record<UserRole, { eyebrow: string; title: string; description: string; actions: { title: string; description: string; accent: string }[] }> = {
   student: { eyebrow: "พื้นที่การเรียนรู้", title: "เรียนรู้ได้ตามจังหวะของคุณ", description: "กลับไปเรียนบทเรียนเลขฐานและฝึกทำโจทย์เพื่อพัฒนาความเข้าใจ", actions: [
@@ -36,8 +36,8 @@ export default function DashboardPage() {
 
   const content = roleContent[session.role];
 
-  function logout() {
-    clearSession();
+  async function handleLogout() {
+    await logout();
     router.replace("/login");
   }
 
@@ -45,7 +45,7 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-[#f7f3ea] text-[#172238]">
       <nav className="flex items-center justify-between border-b border-[#ddd8cc] bg-[#fffdf8] px-5 py-4 sm:px-8">
         <Link href="/dashboard" className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#101a2e] text-xl font-black text-[#c8f169]">#</span><span className="font-bold text-[#101a2e]">base-number</span></Link>
-        <div className="flex items-center gap-3"><span className="hidden text-sm text-[#697386] sm:block">{session.name} · {roleLabels[session.role]}</span><button onClick={logout} className="rounded-lg border border-[#ddd8cc] px-3 py-2 text-sm font-bold text-[#697386] hover:bg-white">ออกจากระบบ</button></div>
+        <div className="flex items-center gap-3"><span className="hidden text-sm text-[#697386] sm:block">{session.name} · {roleLabels[session.role]}</span><button onClick={handleLogout} className="rounded-lg border border-[#ddd8cc] px-3 py-2 text-sm font-bold text-[#697386] hover:bg-white">ออกจากระบบ</button></div>
       </nav>
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <div className="rounded-[2rem] bg-[#101a2e] p-7 text-white shadow-xl shadow-[#101a2e]/15 sm:p-12"><p className="text-sm font-bold uppercase tracking-[0.18em] text-[#c8f169]">{content.eyebrow}</p><h1 className="mt-4 max-w-2xl text-4xl font-black leading-tight sm:text-5xl">สวัสดี {session.name}<br />{content.title}</h1><p className="mt-5 max-w-xl text-lg leading-8 text-[#c4ccda]">{content.description}</p></div>

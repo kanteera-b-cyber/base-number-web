@@ -43,6 +43,7 @@ alter table public.exercises enable row level security;
 alter table public.lesson_progress enable row level security;
 
 create policy "Users can read their profile" on public.profiles for select to authenticated using (auth.uid() = id);
+create policy "Users can create their profile" on public.profiles for insert to authenticated with check (auth.uid() = id);
 create policy "Users can update their profile" on public.profiles for update to authenticated using (auth.uid() = id);
 create policy "Anyone authenticated can read published lessons" on public.lessons for select to authenticated using (published = true or exists (select 1 from public.profiles where id = auth.uid() and role in ('teacher', 'admin')));
 create policy "Teachers and admins can manage lessons" on public.lessons for all to authenticated using (exists (select 1 from public.profiles where id = auth.uid() and role in ('teacher', 'admin'))) with check (exists (select 1 from public.profiles where id = auth.uid() and role in ('teacher', 'admin')));

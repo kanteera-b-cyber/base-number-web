@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUsers, setSession } from "../lib/auth";
+import { loginUser } from "../lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "").trim();
@@ -21,15 +21,13 @@ export default function LoginPage() {
       return;
     }
 
-    const user = getUsers().find((candidate) => candidate.email === email && candidate.password === password);
-    if (!user) {
+    try {
+      await loginUser(email, password);
+      setError("");
+      router.push("/");
+    } catch {
       setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง หรือยังไม่มีบัญชีนี้");
-      return;
     }
-
-    setSession(user);
-    setError("");
-    router.push("/");
   }
 
   return (
