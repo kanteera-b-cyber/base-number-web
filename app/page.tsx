@@ -271,6 +271,7 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState(1);
   const [teacherPanel, setTeacherPanel] = useState<"content" | "exercise" | "results">("content");
   const [adminPanel, setAdminPanel] = useState<"users" | "activity" | "settings">("users");
+  const [studentPanel, setStudentPanel] = useState<"exercise" | "steps" | "table">("exercise");
   const [exerciseSaved, setExerciseSaved] = useState(false);
   const selectedChapter = chapters.find((chapter) => chapter.id === selectedId) ?? chapters[0];
   const isTeacher = session?.role === "teacher";
@@ -342,9 +343,9 @@ export default function Home() {
               </>
             ) : (
               <>
-                <div className="px-4 py-2 bg-[#e06f52] text-white rounded-lg text-sm font-semibold">★ ตัวอย่างฝึกหัด</div>
-                <div className="px-4 py-2 bg-[#263653] text-[#f7f3ea] rounded-lg text-sm font-semibold">★ ขั้นตอนละเอียด</div>
-                <div className="px-4 py-2 bg-[#263653] text-[#f7f3ea] rounded-lg text-sm font-semibold">★ ตารางเปรียบเทียบ</div>
+                <button type="button" onClick={() => setStudentPanel("exercise")} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${studentPanel === "exercise" ? "bg-[#e06f52] text-white" : "bg-[#263653] text-[#f7f3ea] hover:bg-[#314565]"}`}>★ ตัวอย่างฝึกหัด</button>
+                <button type="button" onClick={() => setStudentPanel("steps")} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${studentPanel === "steps" ? "bg-[#e06f52] text-white" : "bg-[#263653] text-[#f7f3ea] hover:bg-[#314565]"}`}>★ ขั้นตอนละเอียด</button>
+                <button type="button" onClick={() => setStudentPanel("table")} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${studentPanel === "table" ? "bg-[#e06f52] text-white" : "bg-[#263653] text-[#f7f3ea] hover:bg-[#314565]"}`}>★ ตารางเปรียบเทียบ</button>
               </>
             )}
           </div>
@@ -352,6 +353,41 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
+        {!isTeacher && !isAdmin && studentPanel === "exercise" && (
+          <section className="mb-6 rounded-2xl border border-[#f8c4b6] bg-[#fff0eb] p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#c95d43]">ฝึกทำโจทย์</p>
+            <h2 className="mt-1 text-2xl font-black text-[#172238]">ตัวอย่างแบบฝึกหัด: {selectedChapter.title}</h2>
+            {selectedChapter.quizzes?.length ? (
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {selectedChapter.quizzes.map((quiz) => (
+                  <div key={quiz.title} className="rounded-xl bg-[#fffdf8] p-4">
+                    <div className="text-sm font-bold text-[#e06f52]">{quiz.title}</div>
+                    <div className="mt-2 text-2xl font-black text-[#101a2e]">{quiz.problem}</div>
+                    <div className="mt-1 text-sm text-[#697386]">{quiz.subtitle}</div>
+                  </div>
+                ))}
+              </div>
+            ) : <p className="mt-4 text-[#46536a]">บทนี้กำลังเตรียมแบบฝึกหัด ลองเลือกบทฐานสอง ฐานแปด ฐานสิบ หรือฐานสิบหก</p>}
+          </section>
+        )}
+
+        {!isTeacher && !isAdmin && studentPanel === "steps" && (
+          <section className="mb-6 rounded-2xl border border-[#d6e9a8] bg-[#eef7d7] p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#738f2d]">วิธีคิดทีละขั้น</p>
+            <h2 className="mt-1 text-2xl font-black text-[#172238]">{selectedChapter.subtitle}</h2>
+            <p className="mt-4 leading-7 text-[#46536a]">{selectedChapter.thinking}</p>
+            <div className="mt-4 rounded-xl bg-[#fffdf8] p-4 font-mono text-sm font-bold text-[#29364c]">{selectedChapter.example}</div>
+          </section>
+        )}
+
+        {!isTeacher && !isAdmin && studentPanel === "table" && (
+          <section className="mb-6 rounded-2xl border border-[#ddd8cc] bg-[#fffdf8] p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e06f52]">ดูภาพรวมตัวเลข</p>
+            <h2 className="mt-1 text-2xl font-black text-[#172238]">ตารางเปรียบเทียบเลขฐาน 0-15</h2>
+            <div className="mt-5 overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b-2 border-[#c8c2b5]"><th className="px-3 py-2 text-left">ฐาน10</th><th className="px-3 py-2">ฐาน2</th><th className="px-3 py-2">ฐาน8</th><th className="px-3 py-2">ฐาน16</th></tr></thead><tbody>{conversionTable.map((row) => <tr key={row.decimal} className="border-b border-[#e4dfd5]"><td className="px-3 py-2">{row.decimal}</td><td className="px-3 py-2 text-center font-mono">{row.binary}</td><td className="px-3 py-2 text-center font-mono">{row.octal}</td><td className="px-3 py-2 text-center font-mono font-bold">{row.hex}</td></tr>)}</tbody></table></div>
+          </section>
+        )}
+
         {isTeacher && teacherPanel === "exercise" && (
           <section className="mb-6 rounded-2xl border border-[#f8c4b6] bg-[#fff0eb] p-6 shadow-sm">
             <div className="mb-5 flex items-start justify-between gap-4">
