@@ -90,8 +90,14 @@ export function getServerReady() {
 }
 
 export async function loginUser(email: string, password: string) {
-  const { error } = await getClient().auth.signInWithPassword({ email, password });
+  const { data, error } = await getClient().auth.signInWithPassword({ email, password });
   if (error) throw error;
+
+  if (!data.session?.user) throw new Error("เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่");
+
+  sessionSnapshot = await loadProfile(data.session.user);
+  authReady = true;
+  notify();
 }
 
 export async function registerUser(name: string, email: string, password: string, role: UserRole) {

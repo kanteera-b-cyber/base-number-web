@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { registerUser, roleLabels, UserRole } from "../lib/auth";
-import { useRouter } from "next/navigation";
 
 const roleOptions: { role: UserRole; description: string }[] = [
   { role: "student", description: "เรียนบทเรียนและทำแบบฝึกหัด" },
@@ -12,7 +11,6 @@ const roleOptions: { role: UserRole; description: string }[] = [
 ];
 
 export default function SignupPage() {
-  const router = useRouter();
   const [role, setRole] = useState<UserRole>("student");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +43,7 @@ export default function SignupPage() {
 
     try {
       await registerUser(name, email, password, role);
-      router.push("/");
+      window.location.assign("/");
     } catch (registrationError) {
       const message = registrationError instanceof Error ? registrationError.message : "";
       const normalizedMessage = message.toLowerCase();

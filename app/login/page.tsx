@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { loginUser } from "../lib/auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,7 +22,7 @@ export default function LoginPage() {
     try {
       await loginUser(email, password);
       setError("");
-      router.push("/");
+      window.location.assign("/");
     } catch {
       setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง หรือยังไม่มีบัญชีนี้");
     }
