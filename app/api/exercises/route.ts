@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   if (!authorize(request)) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
 
   try {
-    const supabase = createServerSupabaseClient();
+    const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from("exercises")
       .select("id, lesson_id, title, problem, created_at")
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: "lessonId, createdBy, title, and problem are required" }, { status: 400 });
     }
 
-    const supabase = createServerSupabaseClient();
+    const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from("exercises")
       .insert({ lesson_id: body.lessonId, created_by: body.createdBy, title: body.title.trim(), problem: body.problem.trim() })

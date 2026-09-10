@@ -1,4 +1,5 @@
 import { createBrowserSupabaseClient } from "./supabase/client";
+import type { AuthChangeEvent, Session as SupabaseSession } from "@supabase/supabase-js";
 
 export type UserRole = "student" | "teacher" | "admin";
 
@@ -44,12 +45,12 @@ function initialize() {
   if (initialized) return;
   initialized = true;
   const client = getClient();
-  void client.auth.getSession().then(async ({ data }) => {
+  void client.auth.getSession().then(async ({ data }: { data: { session: SupabaseSession | null } }) => {
     sessionSnapshot = data.session?.user ? await loadProfile(data.session.user) : null;
     authReady = true;
     notify();
   });
-  client.auth.onAuthStateChange((_event, session) => {
+  client.auth.onAuthStateChange((_event: AuthChangeEvent, session: SupabaseSession | null) => {
     void (async () => {
       sessionSnapshot = session?.user ? await loadProfile(session.user) : null;
       authReady = true;

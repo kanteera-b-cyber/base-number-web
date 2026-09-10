@@ -16,11 +16,11 @@ npm run dev
 1. สร้างโปรเจกต์ที่ [Supabase](https://supabase.com/dashboard)
 2. เปิด **SQL Editor** แล้วรัน [`supabase/schema.sql`](supabase/schema.sql)
 3. คัดลอก [`.env.example`](.env.example) เป็น `.env.local`
-4. ใส่ค่า `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` และ `SUPABASE_TEST_TOKEN` จาก **Project Settings > API** และสร้าง token ทดสอบแบบสุ่มเอง
+4. ใส่ค่า `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` และ `SUPABASE_TEST_TOKEN` จาก **Project Settings > API** และสร้าง token ทดสอบแบบสุ่มเอง
 5. เปิด [http://localhost:3000/api/health](http://localhost:3000/api/health) เพื่อตรวจการอ่านฐานข้อมูล ต้องได้ `{ "ok": true }`
 6. ทดสอบบันทึก/อ่านแบบฝึกหัดผ่าน API โดยส่ง header `x-supabase-test-token` ให้ตรงกับ `SUPABASE_TEST_TOKEN` ไปที่ `/api/exercises`
 
-`SUPABASE_SERVICE_ROLE_KEY` ใช้เฉพาะฝั่ง server ห้ามใส่ใน client component หรือ commit ขึ้น Git
+ใช้ publishable key กับ SSR cookie client เท่านั้น ห้ามนำ secret key ใด ๆ ไปใส่ใน client component หรือ commit ขึ้น Git
 
 ## GitHub
 
