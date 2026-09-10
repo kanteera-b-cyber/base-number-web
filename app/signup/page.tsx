@@ -28,6 +28,11 @@ export default function SignupPage() {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("รูปแบบอีเมลไม่ถูกต้อง เช่น name@example.com");
+      return;
+    }
+
     if (password.length < 6) {
       setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
       return;
@@ -37,7 +42,18 @@ export default function SignupPage() {
       await registerUser(name, email, password, role);
       router.push("/");
     } catch (registrationError) {
-      setError(registrationError instanceof Error ? registrationError.message : "สมัครสมาชิกไม่สำเร็จ");
+      const message = registrationError instanceof Error ? registrationError.message : "";
+      const normalizedMessage = message.toLowerCase();
+
+      if (normalizedMessage.includes("rate limit") || normalizedMessage.includes("too many")) {
+        setError("ระบบถูกเรียกใช้งานบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่");
+      } else if (normalizedMessage.includes("already registered") || normalizedMessage.includes("already exists")) {
+        setError("อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ");
+      } else if (normalizedMessage.includes("invalid email")) {
+        setError("Supabase ไม่ยอมรับอีเมลนี้ กรุณาตรวจสอบรูปแบบอีเมลและการตั้งค่า Email provider");
+      } else {
+        setError("สมัครสมาชิกไม่สำเร็จ กรุณาตรวจสอบการตั้งค่า Supabase แล้วลองใหม่");
+      }
     }
   }
 
@@ -55,15 +71,15 @@ export default function SignupPage() {
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="sm:col-span-2">
               <span className="mb-2 block text-sm font-bold text-[#29364c]">ชื่อที่แสดง</span>
-              <input name="name" placeholder="เช่น สมชาย ใจดี" className="w-full rounded-xl border border-[#ddd8cc] bg-white px-4 py-3.5 outline-none focus:border-[#8dbb38] focus:ring-4 focus:ring-[#dff3ae]" />
+              <input name="name" required autoComplete="name" placeholder="เช่น สมชาย ใจดี" className="w-full rounded-xl border border-[#ddd8cc] bg-white px-4 py-3.5 outline-none focus:border-[#8dbb38] focus:ring-4 focus:ring-[#dff3ae]" />
             </label>
             <label>
               <span className="mb-2 block text-sm font-bold text-[#29364c]">อีเมล</span>
-              <input name="email" type="email" placeholder="you@example.com" className="w-full rounded-xl border border-[#ddd8cc] bg-white px-4 py-3.5 outline-none focus:border-[#8dbb38] focus:ring-4 focus:ring-[#dff3ae]" />
+              <input name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="w-full rounded-xl border border-[#ddd8cc] bg-white px-4 py-3.5 outline-none focus:border-[#8dbb38] focus:ring-4 focus:ring-[#dff3ae]" />
             </label>
             <label>
               <span className="mb-2 block text-sm font-bold text-[#29364c]">รหัสผ่าน</span>
-              <input name="password" type="password" placeholder="อย่างน้อย 6 ตัวอักษร" className="w-full rounded-xl border border-[#ddd8cc] bg-white px-4 py-3.5 outline-none focus:border-[#8dbb38] focus:ring-4 focus:ring-[#dff3ae]" />
+              <input name="password" type="password" required minLength={6} autoComplete="new-password" placeholder="อย่างน้อย 6 ตัวอักษร" className="w-full rounded-xl border border-[#ddd8cc] bg-white px-4 py-3.5 outline-none focus:border-[#8dbb38] focus:ring-4 focus:ring-[#dff3ae]" />
             </label>
           </div>
 
